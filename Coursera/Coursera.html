@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Coursera</title>
+  <meta name="generator" content="Google Web Designer 1.6.0.0429">
+  <style type="text/css" id="gwd-text-style">
+    p {
+      margin: 0px;
+    }
+    h1 {
+      margin: 0px;
+    }
+    h2 {
+      margin: 0px;
+    }
+    h3 {
+      margin: 0px;
+    }
+  </style>
+  <style type="text/css">
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+    }
+    body {
+      transform: perspective(1400px) matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+      transform-style: preserve-3d;
+      background-color: transparent;
+    }
+    .gwd-p-p2ec {
+      position: absolute;
+      width: 1423px;
+      height: 150px;
+      transform-origin: 711.5px 1737px 0px;
+      text-align: justify;
+      left: 15px;
+      top: 0px;
+      background-image: none;
+    }
+    .gwd-span-10n9 {
+      font-size: 36px;
+    }
+    .gwd-span-1ylq {
+      font-size: 20px;
+    }
+    .gwd-img-kv7m {
+      position: absolute;
+      width: 1119px;
+      height: 584px;
+      left: 86px;
+      top: 1517px;
+    }
+    .gwd-span-1oto {
+      position: absolute;
+      width: 1119px;
+      left: 67px;
+      text-align: justify;
+      top: 2154px;
+      height: 912px;
+      transform-origin: 559.5px 157.5px 0px;
+    }
+    .gwd-img-kpnf {
+      position: absolute;
+      width: 1050px;
+      height: 622px;
+      left: 77px;
+      top: 2504px;
+    }
+    .gwd-span-1i1c {
+      position: absolute;
+      width: 1079px;
+      left: 77px;
+      text-align: justify;
+      height: 713px;
+      transform-origin: 549.5px 553.5px 0px;
+      top: 3143px;
+    }
+    .gwd-img-v0bc {
+      position: absolute;
+      height: 608px;
+      width: 1128px;
+      left: 77px;
+      top: 3856px;
+    }
+    .gwd-span-cnfy {
+      position: absolute;
+      width: 98px;
+      height: 335px;
+      left: 779px;
+      top: 251px;
+    }
+    .gwd-span-u4n8 {
+      position: absolute;
+      width: 92px;
+      height: 257px;
+      left: 442px;
+      top: 23px;
+    }
+    .gwd-span-135b {
+      position: absolute;
+      width: 1101px;
+      height: 958px;
+      left: 77px;
+      top: 4486px;
+      text-align: justify;
+    }
+  </style>
+</head>
+
+<body>
+  <p class="gwd-p-p2ec" style=""><span class="gwd-span-10n9">Coursera Practical Machine Learning<br></span>
+  </p>
+  <div class=""><br>
+    <br>
+    
+    <span class="gwd-span-1ylq">Prediction Assignment Writeup</span>
+  </div>
+  <div class=""><br>
+    1. Background: Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement Â– a group
+    of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do,
+    but they rarely quantify how well they do it. In this data set, the participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har
+    (see the section on the Weight Lifting Exercise Dataset). In this project, the goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants toto predict the manner in which praticipants did the exercise. The
+    dependent variable or response is the “classe” variable in the training set.
+  </div>
+  <div class=""><br>
+    2. Data: Downloading the required packages, loading and cleaning the data, testing and training spliting:
+  </div>
+  <div class=""><br>
+    #Downloading the required packages
+  </div>
+  <div class="">library(caret)
+  </div>
+  <div class="">library(rattle)
+  </div>
+  <div class="">library(RGtk2)
+  </div>
+  <div class="">library(tree)
+  </div>
+  <div class="">library(randomForest)
+  </div>
+  <div class="">library(lattice)
+  </div>
+  <div class="">library(ggplot2)
+  </div>
+  <div class="">
+  </div>
+  <div class=""># Preparing, reading and cleaning the data
+  </div>
+  <div class="">
+  </div>
+  <div class="">Alldata&lt;-read.csv("pml-training.csv", na.strings = c("NA", "#DIV/0!", ""))
+  </div>
+  <div class="">&nbsp; &nbsp; testingSet&lt;-read.csv("pml-testing.csv",na.strings=c("NA","#DIV/0!"))
+  </div>
+  <div class="">NA_Count = sapply(1:dim(Alldata)[2],function(x)sum(is.na(Alldata[,x])))
+  </div>
+  <div class="">&nbsp; &nbsp; NA_list = which(NA_Count&gt;0)
+  </div>
+  <div class="">&nbsp; &nbsp;
+  </div>
+  <div class="">&nbsp; &nbsp; Alldata=Alldata[,-NA_list]
+  </div>
+  <div class="">&nbsp; &nbsp; Alldata=Alldata[,-c(1:7)]
+  </div>
+  <div class="">&nbsp; &nbsp; Alldata$classe=factor(Alldata$classe)
+  </div>
+  <div class="">
+  </div>
+  <div class="">&nbsp; &nbsp; NA_Count1=sapply(1:dim(testingSet)[2],function(x)sum(is.na(testingSet[,x])))
+  </div>
+  <div class="">&nbsp; &nbsp; NA_list1=which(NA_Count1&gt;0)
+  </div>
+  <div class="">
+  </div>
+  <div class="">&nbsp; &nbsp; testingSet=testingSet[,-NA_list]
+  </div>
+  <div class="">&nbsp; &nbsp; testingSet=testingSet[,-c(1:7)]
+  </div>
+  <div class="">&nbsp; &nbsp; dim(Alldata)
+  </div>
+  <div class="">#[1] 19622 53
+  </div>
+  <div class="">&nbsp; &nbsp; dim(testingSet)
+  </div>
+  <div class="">#[1] 20 53
+  </div>
+  <div class="">
+  </div>
+  <div class=""><br>
+    3. Test and training: Test and training, with p=0.6:
+  </div>
+  <div class="">#Test and tranning
+  </div>
+  <div class="">inTrain=createDataPartition(y=Alldata$classe, p=0.6, list=FALSE)
+  </div>
+  <div class="">&nbsp; &nbsp; training &lt;-Alldata[inTrain,]
+  </div>
+  <div class="">&nbsp; &nbsp; testing &lt;-Alldata[-inTrain,]
+  </div>
+  <div class="">
+  </div>
+  <div class=""><br>
+    <br>
+    4. Modelling: We now create our model using the functions provided in caret package in R. ## Tree Method Using the Tree method to do the prediction of ‘classe’.
+  </div>
+  <div class="">
+  </div>
+  <div class=""><br>
+    4.1. Regression tree:
+  </div>
+  <div class="">#Regression Trees
+  </div>
+  <div class="">Model1&lt;- train(classe ~ .,method='rpart',data=training)
+  </div>
+  <div class="">&nbsp; &nbsp; fancyRpartPlot(Model1$finalModel)
+  </div>
+  <div class="">print(Model1$finalModel)
+  </div>
+  <div class="">&nbsp; &nbsp;
+  </div>
+  <div class="">## n= 11776
+  </div>
+  <div class="">
+  </div>
+  <div class="">node), split, n, loss, yval, (yprob)
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp; * denotes terminal node
+  </div>
+  <div class="">
+  </div>
+  <div class="">&nbsp;1) root 11776 8428 A (0.28 0.19 0.17 0.16 0.18)
+  </div>
+  <div class="">&nbsp; &nbsp;2) roll_belt&lt; 130.5 10792 7454 A (0.31 0.21 0.19 0.18 0.11)
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp;4) pitch_forearm&lt; -33.65 951 5 A (0.99 0.0053 0 0 0) *
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp;5) pitch_forearm&gt;=-33.65 9841 7449 A (0.24 0.23 0.21 0.2 0.12)
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp; 10) roll_forearm&lt; 125.5 6358 4176 A (0.34 0.24 0.16 0.19 0.069)
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp; &nbsp; 20) magnet_dumbbell_y&lt; 432.5 5209 3090 A (0.41 0.18 0.18 0.17 0.061) *
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp; &nbsp; 21) magnet_dumbbell_y&gt;=432.5 1149 567 B (0.055 0.51 0.03 0.3 0.11) *
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp; 11) roll_forearm&gt;=125.5 3483 2421 C (0.06 0.21 0.3 0.21 0.22) *
+  </div>
+  <div class="">&nbsp; &nbsp;3) roll_belt&gt;=130.5 984 10 E (0.01 0 0 0 0.99) *
+  </div>
+  <div class="">&nbsp; &nbsp;
+  </div>
+  <div class="">&nbsp; &nbsp;
+  </div>
+  <div class="">&nbsp; &nbsp;
+  </div>
+  <div class="">&nbsp; &nbsp;pred=predict(Model1,newdata=testing)
+  </div>
+  <div class="">&nbsp; &nbsp; z=confusionMatrix(pred,testing$classe)
+  </div>
+  <div class="">&nbsp; &nbsp; z$table
+  </div>
+  <div class="">
+  </div>
+  <div class="">&nbsp;## Reference
+  </div>
+  <div class="">Prediction A B C D E
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;A 2003 633 642 575 200
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;B 39 400 24 216 95
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;C 186 485 702 495 490
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;D 0 0 0 0 0
+  </div>
+  <div class="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;E 4 0 0 0 657
+  </div>
+  <div class="">&nbsp;
+  </div>
+  <div class="">z$overall[1]
+  </div>
+  <div class="">##Accuracy
+  </div>
+  <div class="">&nbsp;0.47948<br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    
+  </div>
+  <div class=""><br>
+    
+  </div>
+  <img src="assets/image.png" class="gwd-img-kv7m" style=""><span class="gwd-span-1oto">Figure 1: Tree method prediction plot.
+<div class="">
+</div><div class="">From the confusion matrix it is clear the accuracy of “0.479” for this model fit clearly shows “no purity” hence this model fit is rejected. 
+</div><div class="">
+</div><div class=""><br>4.2.	Tree package: 
+</div><div class="">&nbsp;</div><div class="">#Tree
+</div><div class="">set.seed(12345)
+</div><div class="">tree.training=tree(classe~.,data=training)
+</div><div class="">summary(tree.training)
+</div><div class="">
+</div><div class="">##Classification tree:
+</div><div class="">tree(formula = classe ~ ., data = training)
+</div><div class="">Variables actually used in tree construction:
+</div><div class="">&nbsp;[1] "roll_belt"            "pitch_forearm"        "roll_forearm"         "magnet_dumbbell_x"    "magnet_dumbbell_y"    "magnet_dumbbell_z"    "pitch_belt"           "yaw_belt"             "accel_forearm_z"      "total_accel_dumbbell"
+</div><div class="">[11] "accel_forearm_x"     
+</div><div class="">Number of terminal nodes:  19 
+</div><div class="">Residual mean deviance:  1.651 = 19420 / 11760 
+</div><div class="">Misclassification error rate: 0.3134 = 3691 / 11776<br><br><br><br> 
+</div><div class=""><br><br><br></div></span><span class="gwd-span-1i1c">Figure 2: Tree method prediction plot.<br class="">
+<div class="">
+</div><div class=""><br><br>4.3.	Cross validation: We are going to check the performance of the tree on the testing data by cross validation. The 0.676 is not very accurate. The 0.495 from 'caret' package is much lower than the result from 'tree' package.
+</div><div class="">
+</div><div class=""><br>#Cross validation
+</div><div class="">tree.pred=predict(tree.training,testing,type="class")
+</div><div class="">predMatrix = with(testing,table(tree.pred,classe))
+</div><div class="">sum(diag(predMatrix))/sum(as.vector(predMatrix)) 
+</div><div class="">##[1] 0.6758858
+</div><div class="">
+</div><div class="">#Caret Package
+</div><div class="">tree.pred=predict(modFit,testing)
+</div><div class="">predMatrix = with(testing,table(tree.pred,classe))
+</div><div class="">sum(diag(predMatrix))/sum(as.vector(predMatrix))
+</div><div class="">##[1] 0.4949019
+</div><div class="">
+</div><div class=""><br><br>4.4.	Random forest: Using Random forest method to do the prediction. Provides 99% accurancy hence this model has been choosen to do predict the testing data set.
+</div><div class="">
+</div><div class=""><br>#Random Forest Model
+</div><div class="">
+</div><div class=""><br>Model2=randomForest(classe~., data=training, method='class')
+</div><div class="">&nbsp; &nbsp; pred2 = predict(Model2,testing,type='class') 
+</div><div class="">&nbsp; &nbsp; qplot(roll_belt, magnet_dumbbell_y, colour=classe, data=training)  
+</div><div class="">
+</div><div class="">pred=predict(Model1,newdata=testing)
+</div><div class="">&nbsp; &nbsp; z=confusionMatrix(pred,testing$classe)
+</div><div class="">&nbsp; &nbsp; z$table
+</div><div class=""><br>## Reference
+</div><div class="">Prediction    A    B    C    D    E
+</div><div class="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;A 2003  633  642  575  200
+</div><div class="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;B   39  400   24  216   95
+</div><div class="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;C  186  485  702  495  490
+</div><div class="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;D    0    0    0    0    0
+</div><div class="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;E    4    0    0    0  657
+</div><div class="">
+</div><div class="">z2$overall[1]
+</div><div class="">Accuracy 
+</div><div class="">0.9947744
+</div><div class=""><br></div></span>
+  <img src="assets/image_2.png" class="gwd-img-kpnf">
+  <img src="assets/image_4.png" class="gwd-img-v0bc"><span class="gwd-span-cnfy"><br></span><span class="gwd-span-u4n8"><br></span><span class="gwd-span-135b">Figure 3: Random forest plot 
+<div>
+</div><div>5.	Conclusion: Random forest method provides the best fit model and it is been considered for testing the test data set to submit results.
+</div><div></div><div>#Conclusion
+</div><div>
+</div><div>Pred3= predict(Model2,testingSet,type='class')
+</div><div>&nbsp; &nbsp; nofiles = length(Pred3)
+</div><div>&nbsp; &nbsp; for (i in 1:nofiles){
+</div><div>&nbsp; &nbsp; &nbsp; &nbsp; filename =  paste0("problem_id",i,".txt")
+</div><div>&nbsp; &nbsp; &nbsp; &nbsp; write.table(Pred3[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+</div><div>&nbsp; &nbsp; }
+</div><div>&nbsp; &nbsp; Pred3	
+</div><div>&nbsp;
+</div><div>##1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
+</div><div>&nbsp;B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
+</div><div>Levels: A B C D E	
+</div><div><br></div></span>
+</body>
+
+</html>
